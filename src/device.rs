@@ -7,7 +7,7 @@ use log::warn;
 
 use std::convert::TryFrom;
 use std::mem;
-
+use std::env;
 use crate::error::{GPUError, GPUResult};
 
 #[cfg(feature = "cuda")]
@@ -319,6 +319,37 @@ impl Device {
     /// Returns the device matching the unique ID if there is one.
     pub fn by_unique_id(unique_id: UniqueId) -> Option<&'static Device> {
         Self::all_iter().find(|d| unique_id == d.unique_id())
+    }
+
+    /// Returns the device matching the unique ID if there is one.
+    pub fn get_suitable_device() -> Vec<&'static Device> {
+
+        let uudistr = match env::var("DEVICES_BY_UUID") {
+            Ok(val) => val,
+            Err(_) => {
+                String::from("no")
+            }
+        };
+
+        if uudistr == "no"{
+            return Self::all();
+        }else {
+            let duuid = DeviceUuid::try_from(uudistr.as_str()).unwrap();
+            let why = Self::by_uuid(duuid);
+
+            let gd = match why {
+                Some(t) => t,
+                None => {
+                    &DEVICES.0[0]
+                },
+
+            };
+
+            let v: Vec<&'static Device> = vec![gd];
+
+
+            return v;
+        }
     }
 
     /// Returns an iterator of all available GPUs that are supported.
