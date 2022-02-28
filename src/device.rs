@@ -335,20 +335,16 @@ impl Device {
         if uudistr == "no"{
             return Self::all();
         }else {
-            let duuid = DeviceUuid::try_from(uudistr.as_str()).unwrap();
-            let why = Self::by_uuid(duuid);
+            let duuid = UniqueId::try_from(uudistr.as_str()).unwrap();
+            let why = Self::by_unique_id(duuid);
 
             let gd = match why {
                 Some(t) => t,
                 None => {
                     &DEVICES.0[0]
-                },
-                
+                },  
             };
-
             let v: Vec<&'static Device> = vec![gd];
-
-            
             return v;
         }
     }
