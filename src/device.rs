@@ -1,7 +1,7 @@
 use std::fmt;
 
 use lazy_static::lazy_static;
-use log::debug;
+use log::{debug,info};
 #[cfg(all(feature = "opencl", feature = "cuda"))]
 use log::warn;
 
@@ -339,7 +339,10 @@ impl Device {
             let why = Self::by_unique_id(duuid);
 
             let gd = match why {
-                Some(t) => t,
+                Some(t) => {
+                    info!("get device by_unique_id : {:?}", t);
+                    t
+                },
                 None => {
                     &DEVICES.0[0]
                 },  
